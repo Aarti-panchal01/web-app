@@ -83,10 +83,14 @@ export class EditNotificationComponent implements OnInit {
    * if successful redirects to view Notification configuration.
    */
   submit() {
-    this.systemService
-      .updateExternalConfiguration('NOTIFICATION', this.notificationConfigurationForm.value)
-      .subscribe((response: any) => {
-        this.router.navigate(['../'], { relativeTo: this.route });
-      });
+    const configuration = { ...this.notificationConfigurationForm.value };
+    // Fineract returns the server_key masked and stores whatever it is sent,
+    // so only send it when it was changed here
+    if (!this.notificationConfigurationForm.get('server_key').dirty) {
+      delete configuration.server_key;
+    }
+    this.systemService.updateExternalConfiguration('NOTIFICATION', configuration).subscribe((response: any) => {
+      this.router.navigate(['../'], { relativeTo: this.route });
+    });
   }
 }

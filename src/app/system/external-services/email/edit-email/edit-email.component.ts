@@ -108,10 +108,14 @@ export class EditEmailComponent implements OnInit {
    * if successful redirects to view Email configuration.
    */
   submit() {
-    this.systemService
-      .updateExternalConfiguration('SMTP', this.emailConfigurationForm.value)
-      .subscribe((response: any) => {
-        this.router.navigate(['../'], { relativeTo: this.route });
-      });
+    const configuration = { ...this.emailConfigurationForm.value };
+    // Fineract returns the password masked and stores whatever it is sent,
+    // so only send it when it was changed here
+    if (!this.emailConfigurationForm.get('password').dirty) {
+      delete configuration.password;
+    }
+    this.systemService.updateExternalConfiguration('SMTP', configuration).subscribe((response: any) => {
+      this.router.navigate(['../'], { relativeTo: this.route });
+    });
   }
 }
